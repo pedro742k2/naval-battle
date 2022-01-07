@@ -29,8 +29,6 @@
 
 ## Funcionamento
 
-# ISTO É UM TESTE
-
 ### Regras gerais:
 
 - Para cada posição do tabuleiro é representada uma coordenada (x, y);
