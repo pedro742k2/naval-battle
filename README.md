@@ -1,11 +1,10 @@
 # Trabalho Prático - Programação
 
-> README.md no [hackmd.io](https://hackmd.io/@pedro742k2/batalha-naval).
-
 ## Hiperligações essenciais
 - [Enunciado](https://moodle.ubi.pt/pluginfile.php/531717/mod_resource/content/1/BatalhaNaval.pdf);
 - [Código base](https://moodle.ubi.pt/pluginfile.php/531716/mod_resource/content/1/BatalhaNaval.c);
-- [Repositório do trabalho]().
+- [Repositório do trabalho](https://github.com/pedro742k2/naval-battle);
+- [Ficheiro fonte README.md](https://hackmd.io/@pedro742k2/batalha-naval).
 
 ## Elementos do grupo
 |            Nome            | Número |
