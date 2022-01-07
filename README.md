@@ -1,5 +1,7 @@
 # Trabalho Prático - Programação
 
+> README.md no [hackmd.io](https://hackmd.io/@pedro742k2/batalha-naval).
+
 ## Hiperligações essenciais
 - [Enunciado](https://moodle.ubi.pt/pluginfile.php/531717/mod_resource/content/1/BatalhaNaval.pdf);
 - [Código base](https://moodle.ubi.pt/pluginfile.php/531716/mod_resource/content/1/BatalhaNaval.c);
