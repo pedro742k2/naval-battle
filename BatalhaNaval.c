@@ -457,21 +457,6 @@ int main(void)
   init_board(N, M, &brd);
   print_board(N, M, brd.board, 1);
 
-  //Testes
-  /* Boat boat;
-  Position pos;
-  pos.x = 2;
-  pos.y = 4;
-  init_boat(&boat, 'P', pos, 'H');
-  int isFree = check_free(M, M, &boat, brd.board);
-
-  printf("---BOAT INFO---\nafloat: %d;\ntSize: %d;\ntype: %c;\n", boat.afloat, boat.tSize, boat.type);
-
-  for (int i = 0; i < boat.tSize; i++)
-  {
-    printf("Coordinates:\n\tafloat: %d;\n\tx: %d;\n\ty: %d.\n", boat.coord[i].afloat, boat.coord[i].pos.x, boat.coord[i].pos.y);
-  } */
-
   /**Exemplo de uso da print_board e da place_boat**/
   /**Precisa de as implementar primeiro**/
   //print_board(N, M, brd.board, 0);
