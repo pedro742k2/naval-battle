@@ -335,30 +335,14 @@ char check_sink(int x, int y, Board *board)
     return 'I';
   }
 
-  /*
-  * 1.) Verificar se algum barco foi atingido. Se:
-    1.1.) Não, retorna 'F';
-    1.2.) Sim, contínua para o próximo passo.
-  * 2.) Alterar as seguintes variáveis:
-    2.1.) Encontrar o barco atingido (*targetedBoat) e o índice do vetor das coordenadas (coordIndex);
-    2.2.) Verifica se as coordenadas já foram atacadas anteriormente. Se não:
-      2.2.1.) targetedBoat->coord[coordIndex]->afloat = 0;
-      2.2.2.) targetedBoat->afloat--.
-  * 3.) Verificar se o respetivo barco foi afundado. Se sim, altera:
-    3.1.) Board->numBoatsAfloat--;
-    3.2.) Nas coordenadas desse barco, troca os asteriscos (*) pela letra 'A'.
-  * 4.) Por fim, retorna a letra representante do tipo do respetivo barco. 
-  */
-
-  // Passo 1
+  // Caso não tenha sido atingido nenhum barco (ou seja, nenhum afundado).
   if (board->board[x][y] == ' ')
   {
     return 'F';
   }
 
-  // Passo 2.1
   Boat *targetedBoat;
-  int coordIndex;
+  // Encontra o barco atingido
   for (int i = 0; i < B; i++)
   {
     for (int j = 0; j < 5; j++)
@@ -366,31 +350,32 @@ char check_sink(int x, int y, Board *board)
       if (board->boats[i].coord[j].pos.x == x && board->boats[i].coord[j].pos.y == y)
       {
         targetedBoat = &board->boats[i];
-        coordIndex = j;
+
+        // Verifica se a coordenada já havia sido atingida. Se não, atualiza os valores da mesma.
+        if (targetedBoat->coord[j].afloat)
+        {
+          // Decrementa o número posições não afundadas.
+          targetedBoat->afloat--;
+          // Indica que a coordenada foi afundada.
+          targetedBoat->coord[j].afloat = 0;
+
+          // Verifica se o barco foi totalmente afundado.
+          if (!targetedBoat->afloat)
+          {
+            // Decrementa o número de barcos não afundados.
+            board->numBoatsAfloat--;
+            // Retorna o tipo do barco.
+            return board->board[x][y];
+          }
+        }
+
         break;
       }
     }
   }
 
-  // Passo 2.2
-  if (targetedBoat->coord[coordIndex].afloat)
-  {
-    targetedBoat->coord[coordIndex].afloat = 0;
-    targetedBoat->afloat--;
-  }
-
-  // Passo 3
-  if (targetedBoat->afloat == 0)
-  {
-    board->numBoatsAfloat--;
-    for (int i = 0; i < targetedBoat->tSize; i++)
-    {
-      // targetedBoat->coord[i]
-      board->board[targetedBoat->coord[i].pos.x][targetedBoat->coord[i].pos.y] = 'A';
-    }
-  }
-
-  return board->board[x][y];
+  // Caso o barco atingido não tenha sido afundado.
+  return 'F';
 }
 
 /**
@@ -417,8 +402,52 @@ char check_sink(int x, int y, Board *board)
 int target(int x, int y, Board *board)
 {
   //Implementar
+  int checkSink = check_sink(x, y, board);
 
-  return -3;
+  Boat *targetedBoat;
+  // Encontra o barco atingido
+  for (int i = 0; i < B; i++)
+  {
+    for (int j = 0; j < 5; j++)
+    {
+      if (board->boats[i].coord[j].pos.x == x && board->boats[i].coord[j].pos.y == y)
+      {
+        targetedBoat = &board->boats[i];
+        break;
+      }
+    }
+  }
+
+  // Retorna 0 se a coordenada já foi atingida anteriormente.
+  if (board->board[x][y] == "*" || board->board[x][y] == 'A')
+  {
+    return 0;
+  }
+
+  switch (checkSink)
+  {
+  case 'I':
+    return -2;
+
+  case 'F':
+    board->board[x][y] = checkSink; // checkSink = 'F', neste caso.
+    return -1;
+
+  default:
+    // Verifica se foi afundado. Se sim, coloca 'A' nas posições do barco.
+    if (!targetedBoat->afloat)
+    {
+      for (int i = 0; i < targetedBoat->tSize; i++)
+      {
+        board->board[targetedBoat->coord[i].pos.x][targetedBoat->coord[i].pos.y] = 'A';
+      }
+      return targetedBoat->tSize;
+    }
+    // Caso não tenha sido afundado, coloca um asterísco na coordenada atacada.
+
+    return 1;
+    board->board[x][y] = '*';
+  }
 }
 
 //int colocaNavio()
