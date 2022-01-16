@@ -5,6 +5,9 @@
  **/
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 // Número de barcos (B)
 #define B 6
@@ -522,21 +525,53 @@ int checkTypeAvailability(Board board, char type)
   return 1;
 }
 
+/**
+ * Function: askNewGame
+ * 
+ * Pergunta ao jogador se deseja começar um novo jogo.
+ * 
+ * returns:
+ *  1 se o jogador desejar começar um novo jogo
+ *  0 caso contrário
+ * 
+ **/
+int askNewGame(void)
+{
+  // Verifica se o jogador deseja começar um novo jogo.
+  char newGame = ' ';
+  // Ciclo irá repetir até que uma opção válida seja introduzida.
+  while (newGame != 'S' && newGame != 'N')
+  {
+    system("clear");
+    printf("Deseja começar um novo jogo [S/N]: ");
+    scanf(" %c", &newGame);
+  }
+
+  if (newGame == 'N')
+  {
+    return 0;
+  }
+
+  return 1;
+}
+
+// ? colocaNavio();
 int main(void)
 {
   Board brd;
-  init_board(N, M, &brd);
 
-  /**Exemplo de uso da print_board e da place_boat**/
-  /**Precisa de as implementar primeiro**/
-  //print_board(N, M, brd.board, 0);
-  //place_boat(1, 3, 'H', 'P', &brd);
+  // Número de jogadas feitas (começa com 0 e acaba em 2).
+  int plays = 0;
 
+  // Nome dos jogadores
   char player1[100] = "", player2[100] = "";
+
+  system("clear");
+
   printf("Bem-vindos. Primeiramente, insiram os nomes dos jogadores (Máximo 100 caracteres):\n");
-  printf("Jogador 1 (defensor): ");
+  printf("Jogador defensor: ");
   fgets(player1, 100, stdin);
-  printf("Jogador 2 (atacante): ");
+  printf("Jogador atacante: ");
   fgets(player2, 100, stdin);
 
   // Remoção da quebra de linha dos nomes dos jogadores
@@ -553,137 +588,306 @@ int main(void)
     }
   }
 
-  printf("Agora que ambos os jogadores estão identificados, o jogador 1 (%s) irá proceder à colocação dos %d barcos.\n", player1, B);
-
-  // Variáveis auxiliares.
-  char boatType, dir;
-  int boatSize, x, y;
-  /** Máximo de cada tipo de barco:
-   * 1 'P'
-   * 1 'N'
-   * 2 'C'
-   * 2 'S' */
-
-  for (int i = 0; i < B; i++)
+  // Enquanto não forem realizadas 2 jogadas (plays = {0, 1}), o jogo continua.
+  while (plays < 2)
   {
-    // While "checkBoatPlacement" is false (0), program will keep asking for valid boat info
-    int checkBoatPlacement = 0;
+    init_board(N, M, &brd);
 
-    // Enquanto "checkBoatPlacement" for zero, continua a pedir novos dados.
-    while (!checkBoatPlacement)
+    char defender[100], attacker[100];
+
+    if (!plays)
     {
-      print_board(N, M, brd.board, 1);
+      // Se for a primeira jogada (play = 0)
+      strcpy(defender, player1);
+      strcpy(attacker, player2);
+    }
+    else
+    {
+      // Se for a segunda jogada (play = 1)
+      strcpy(defender, player2);
+      strcpy(attacker, player1);
+    }
 
-      printf("Nota: %s, restam colocar %d navios.\n--- Barco %d ---\n", player1, B - brd.numBoatsAfloat, i);
+    system("clear");
+    printf("O jogador %s irá proceder à colocação dos %d navios e o jogador %s irá atacá-los.\n\n", defender, B, attacker);
 
-      // Tipo de barco e nº de posições.
-      printf("Tipo de barco ('P', 'N', 'C' ou 'S'): ");
-      scanf(" %c", &boatType);
+    time_t timestamp;
+    short int interval = 0.1;
+    printf("A colocar o barco 1\n");
+    place_boat(1, 1, 'H', 'P', &brd);
+    timestamp = time(NULL) + interval;
+    while (timestamp >= time(NULL))
+      ;
+    printf("A colocar o barco 2\n");
+    place_boat(7, 1, 'V', 'N', &brd);
+    timestamp = time(NULL) + interval;
+    while (timestamp >= time(NULL))
+      ;
+    printf("A colocar o barco 3\n");
+    place_boat(2, 3, 'H', 'C', &brd);
+    timestamp = time(NULL) + interval;
+    while (timestamp >= time(NULL))
+      ;
+    printf("A colocar o barco 4\n");
+    place_boat(0, 4, 'V', 'C', &brd);
+    timestamp = time(NULL) + interval;
+    while (timestamp >= time(NULL))
+      ;
+    printf("A colocar o barco 5\n");
+    place_boat(3, 5, 'H', 'S', &brd);
+    timestamp = time(NULL) + interval;
+    while (timestamp >= time(NULL))
+      ;
+    printf("A colocar o barco 6\n");
+    place_boat(6, 6, 'V', 'S', &brd);
+    timestamp = time(NULL) + interval;
+    while (timestamp >= time(NULL))
+      ;
 
-      boatSize = typeToSize(boatType);
+    // Variáveis auxiliares.
+    char boatType, dir;
+    int boatSize, x, y;
 
-      // Direção do barco;
-      printf("\nIndique a direção do barco.\n('H' - Horizontal e 'V' - Vertical): ");
-      scanf(" %c", &dir);
+    /* for (int i = 0; i < B; i++)
+    {
+      // While "checkBoatPlacement" is false (0), program will keep asking for valid boat info
+      int checkBoatPlacement = 0;
 
-      // Coordenadas iniciais.
-      printf("\nConsiderando o barco '%c' com %d posições, insira as coordenadas iniciais.\nO tabuleiro tem %d linhas e %d colunas, ou seja:\n\"x inicial\" deve estar compreendido entre 0 e %d;\n\"y inicial\" deve estar compreendido entre 0 e %d:\n", boatType, boatSize, N, M, N - 1, N - 1);
-      printf("x inicial: ");
-      scanf("%d", &x);
-      printf("y inicial: ");
-      scanf("%d", &y);
-
-      if (!checkTypeAvailability(brd, boatType))
+      // Enquanto "checkBoatPlacement" for zero, continua a pedir novos dados.
+      while (!checkBoatPlacement)
       {
-        printf("Tipo de barco indisponível. Por favor, adicione um dos disponíveis.\n");
-      }
-      else
-      {
-        int boatPlacement = place_boat(x, y, dir, boatType, &brd);
+        print_board(N, M, brd.board, 1);
 
-        switch (boatPlacement)
+        printf("\n%s, restam colocar %d navios.\n--- Barco %d ---\n", defender, B - brd.numBoatsAfloat, i);
+
+        // Tipo de barco e nº de posições.
+        printf("Tipo de barco ('P', 'N', 'C' ou 'S'): ");
+        scanf(" %c", &boatType);
+
+        boatSize = typeToSize(boatType);
+
+        // Direção do barco;
+        printf("Indique a direção do barco.\n('H' - Horizontal ou 'V' - Vertical): ");
+        scanf(" %c", &dir);
+
+        // Coordenadas iniciais.
+        printf("\nConsiderando o barco '%c' com %d posições, insira as coordenadas iniciais.\nO tabuleiro tem %d linhas e %d colunas, ou seja:\n\"x inicial\" deve estar compreendido entre 0 e %d;\n\"y inicial\" deve estar compreendido entre 0 e %d:\n", boatType, boatSize, N, M, N - 1, N - 1);
+        printf("x inicial: ");
+        scanf("%d", &x);
+        printf("y inicial: ");
+        scanf("%d", &y);
+
+        system("clear");
+        printf("-------------------------------------------------------------------\n");
+        if (!checkTypeAvailability(brd, boatType))
         {
-        case -1:
-          printf("Uma das posições já se encontra ocupada.\n");
-          break;
+          printf("Tipo de barco indisponível. Por favor, adicione um dos disponíveis.\n");
+        }
+        else
+        {
+          int boatPlacement = place_boat(x, y, dir, boatType, &brd);
 
-        case -2:
-          printf("Coordenadas inválidas\n");
-          break;
+          switch (boatPlacement)
+          {
+          case -1:
+            printf("Uma das posições já se encontra ocupada.\n");
+            break;
 
-        case -3:
-          printf("Direção inválida\n");
-          break;
+          case -2:
+            printf("Coordenadas inválidas\n");
+            break;
 
-        case -4:
-          printf("Tipo de barco inválido\n");
-          break;
+          case -3:
+            printf("Direção inválida\n");
+            break;
 
-        default:
-          printf("Barco colocado com sucesso.\n");
-          checkBoatPlacement = 1;
+          case -4:
+            printf("Tipo de barco inválido\n");
+            break;
+
+          default:
+            printf("Barco colocado com sucesso.\n");
+            checkBoatPlacement = 1;
+          }
+        }
+        printf("-------------------------------------------------------------------\n\n");
+
+        if (!checkBoatPlacement)
+        {
+          printf("Ser-lhe-ão pedidas as informações novamente...\n");
+        }
+      }
+    } */
+
+    system("clear");
+
+    /** Variáveis auxiliares:
+     * availablePlays: Jogadas disponíveis;
+     * (targetX, targetY): Coordenadas a atacar;
+     * Surrender: Caso o jogador atacante veja o tabuleiro adversário, rendendo-se;
+     * Exit: Caso o jogador atacante decidir sair do jogo.
+     */
+    int availablePlays = 40, targetX, targetY, surrender = 0, exit = 0;
+    // Variável usada para continuar o jogo, depois de uma pausa no terminal.
+    char continueGame[10];
+    // Cópia do tabuleiro inicial.
+    Board cloneBoard = brd;
+
+    while (availablePlays > 0 && brd.numBoatsAfloat)
+    {
+      print_board(N, M, brd.board, 0);
+
+      if (surrender)
+      {
+        printf("\nATENÇÃO: %s já ganhou o jogo, dado que visualizou o tabuleiro do mesmo.", defender);
+      }
+      printf("\n%s, você tem %d jogadas e restam afundar %d navios.\nCaso deseje (declarando a vitória a %s):\n - Sair, digite \"-1\" numa das coordenadas.\n - Ver todos os navios (o jogo continuará), digite \"-2\" numa das coordenadas.\n", attacker, availablePlays, brd.numBoatsAfloat, defender);
+      printf("Coordenada a atacar:\n");
+      printf("x: ");
+      scanf("%d", &targetX);
+      printf("y: ");
+      scanf("%d", &targetY);
+
+      if (targetX == -1 || targetY == -1)
+      {
+        // Caso o jogador decida sair do jogo.
+
+        // Confirma se o jogador realmente quer desistir.
+        char confirmSurrender = ' ';
+        // Ciclo irá repetir até que uma opção válida seja introduzida.
+        while (confirmSurrender != 'S' && confirmSurrender != 'N')
+        {
+          system("clear");
+          printf("Deseja realmente sair? [S/N]: ");
+          scanf(" %c", &confirmSurrender);
+        }
+
+        if (confirmSurrender == 'N')
+        {
+          system("clear");
+          continue;
+        }
+
+        printf("%s saiu do jogo.\n", attacker);
+        exit = 1;
+        break;
+      }
+      else if (targetX == -2 || targetY == -2)
+      {
+        // Confirma se o jogador realmente quer desistir.
+        char confirmSurrender = ' ';
+        // Ciclo irá repetir até que uma opção válida seja introduzida.
+        while (confirmSurrender != 'S' && confirmSurrender != 'N')
+        {
+          system("clear");
+          printf("Quer realmente desistir do jogo ao ver o tabuleiro inimigo?\nO jogo continuará de qualquer forma.\nDeseja desistir [S/N]: ");
+          scanf(" %c", &confirmSurrender);
+        }
+
+        if (confirmSurrender == 'N')
+        {
+          system("clear");
+          continue;
+        }
+
+        // Caso o jogador desista, vendo o tabuleiro adversário.
+        surrender = 1;
+
+        // Reinicia o valor da string "continueGame".
+        strcpy(continueGame, "");
+        // Enquanto o input for diferente de "ok"...
+        while (strcmp(continueGame, "ok"))
+        {
+          system("clear");
+          printf("ATENÇÃO: %s, você perdeu o jogo. O jogo continuará de qualquer forma.\nO tabuleiro com os navios de %s será exibido.\n\n", attacker, defender);
+
+          print_board(N, M, cloneBoard.board, 1);
+
+          printf("\nEscreva \"ok\" para continuar: ");
+          scanf(" %s", continueGame);
+        }
+
+        system("clear");
+        continue;
+      }
+
+      system("clear");
+
+      int targetState = target(targetX, targetY, &brd);
+      printf("---------------------------------------------\n");
+      switch (targetState)
+      {
+      case 0:
+        printf("Esta coordenada já foi atacada anteriormente.\n");
+        break;
+
+      case 1:
+        printf("Acertou num navio. Ainda não o afundou.\n");
+        availablePlays--;
+        break;
+
+      case -1:
+        printf("Sem sucesso.\n");
+        availablePlays--;
+        break;
+
+      case -2:
+        printf("Coordenada inválida.\n");
+        break;
+
+      default:
+        printf("Barco afundado.\n");
+        availablePlays--;
+      }
+      printf("---------------------------------------------\n\n");
+    }
+
+    if (!plays)
+    {
+      // Reinicia o valor da string "continueGame".
+      strcpy(continueGame, "");
+      // Enquanto o input for diferente de "ok"...
+      while (strcmp(continueGame, "ok"))
+      {
+        system("clear");
+
+        printf("Parabéns %s, você ganhou a %dª ronda.\n", (!brd.numBoatsAfloat && !surrender && !exit) ? attacker : defender, plays + 1);
+
+        printf("\nEscreva \"ok\" para continuar: ");
+        scanf(" %s", continueGame);
+
+        if (exit)
+        {
+          // Pergunta se o jogador deseja começar um novo jogo.
+          if (!askNewGame())
+          {
+            // Caso não, sai
+            system("clear");
+            return 0;
+          }
+
+          // Se sim, começa um novo jogo reiniciando o número de jogadas.
+          plays = 0;
+          continue;
         }
       }
 
-      if (!checkBoatPlacement)
+      plays++;
+    }
+    else
+    {
+      // Pergunta se o jogador deseja começar um novo jogo.
+      if (!askNewGame())
       {
-        printf("Ser-lhe-ão pedidas as informações novamente...\n");
+        // Caso não, sai
+        system("clear");
+        return 0;
       }
+
+      // Se sim, começa um novo jogo reiniciando o número de jogadas.
+      plays = 0;
+      continue;
     }
-  }
-
-  print_board(N, M, brd.board, 1);
-
-  int availablePlays = 40, targetX, targetY;
-
-  while (availablePlays >= 0)
-  {
-    print_board(N, M, brd.board, 0);
-
-    printf("%s, você tem %d jogadas e restam afundar %d navios.\nCaso deseje (declarando a vitória a %s):\n - Sair, digite \"-1\" numa das coordenadas.\n - Ver todos os navios (o jogo continuará), digite \"-2\" numa das coordenadas.\n", player2, availablePlays, brd.numBoatsAfloat, player1);
-    printf("Coordenada a atacar:\n");
-    printf("x: ");
-    scanf("%d", &targetX);
-    printf("y: ");
-    scanf("%d", &targetY);
-
-    if (targetX == -1 || targetY == -1)
-    {
-      printf("%s ganhou o jogo! A sair...\n", player1);
-      return 0;
-    }
-    else if (targetX == -2 || targetY == -2)
-    {
-      // Função para mostar todos os navios.
-    }
-
-    int targetState = target(targetX, targetY, &brd);
-    printf("\n---------------------------------------------\n");
-    switch (targetState)
-    {
-    case 0:
-      printf("Esta coordenada já foi atacada anteriormente.\n");
-      break;
-
-    case 1:
-      printf("Acertou num navio. Ainda não o afundou.\n");
-      availablePlays--;
-      break;
-
-    case -1:
-      printf("Sem sucesso.\n");
-      availablePlays--;
-      break;
-
-    case -2:
-      printf("Coordenada inválida.\n");
-      break;
-
-    default:
-      printf("Barco afundado.\n");
-      availablePlays--;
-    }
-    printf("---------------------------------------------\n");
   }
 
   return 0;
