@@ -604,8 +604,7 @@ int main(void)
   // Nome dos jogadores
   char player1[100] = "", player2[100] = "";
 
-  // system("clear");
-
+  printf("----------------------------------------------------------------------------------\n");
   printf("Bem-vindos. Primeiramente, insiram os nomes dos jogadores (Máximo 100 caracteres):\n");
   printf("Jogador defensor: ");
   fgets(player1, 100, stdin);
@@ -647,7 +646,7 @@ int main(void)
     }
 
     system("clear");
-    printf("O jogador %s irá proceder à colocação dos %d navios e o jogador %s irá atacá-los.\n\n", defender, B, attacker);
+    printf("Partida %d/2.\n%s irá proceder à colocação dos %d navios e %s irá atacá-los.\n\n", plays + 1, defender, B, attacker);
 
     /* time_t timestamp;
     short int interval = 0.1;
@@ -780,7 +779,7 @@ int main(void)
         printf("\nATENÇÃO: %s já ganhou o jogo, dado que visualizou o tabuleiro do mesmo.", defender);
       }
 
-      printf("\n%s, você tem %d jogadas e restam afundar %d navios ", attacker, availablePlays, brd.numBoatsAfloat);
+      printf("\nPartida %d/2. %s, você tem %d jogadas e restam afundar %d navios ", plays + 1, attacker, availablePlays, brd.numBoatsAfloat);
       listBoatsAfloat(brd);
       printf(".\nCaso deseje (declarando a vitória a %s):\n - Sair, digite \"-1\" numa das coordenadas.\n - Ver todos os navios (o jogo continuará), digite \"-2\" numa das coordenadas.\n", defender);
       printf("Coordenada a atacar:\n");
