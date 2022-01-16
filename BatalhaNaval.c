@@ -485,6 +485,42 @@ int target(int x, int y, Board *board)
 }
 
 /**
+ * Function: listBoatsAfloat
+ * 
+ * Lista os barcos não afundados.
+ * 
+ * board: estado atual do tabuleiro
+ * 
+ * returns:
+ *  1 se o tipo de barco está disponível
+ *  0 caso contrário
+ * 
+ **/
+void listBoatsAfloat(Board board)
+{
+  // Variável auxiliar para verificar o primeiro barco não afundado, com finalidade de formatação
+  int firstBoatAfloat = 1;
+
+  printf("(");
+  for (int i = 0; i < B; i++)
+  {
+    if (board.boats[i].afloat)
+    {
+      // Coloca uma vírgula a separar os tipos, à excessão da primeira iteração.
+      if (!firstBoatAfloat)
+      {
+        printf(", ");
+      }
+
+      printf("%c", board.boats[i].type);
+
+      firstBoatAfloat = 0;
+    }
+  }
+  printf(")");
+}
+
+/**
  * Function: checkTypeAvailability
  * 
  * Verifica se existem barcos do tipo dado disponíveis.
@@ -566,7 +602,7 @@ int main(void)
   // Nome dos jogadores
   char player1[100] = "", player2[100] = "";
 
-  system("clear");
+  // system("clear");
 
   printf("Bem-vindos. Primeiramente, insiram os nomes dos jogadores (Máximo 100 caracteres):\n");
   printf("Jogador defensor: ");
@@ -611,7 +647,7 @@ int main(void)
     system("clear");
     printf("O jogador %s irá proceder à colocação dos %d navios e o jogador %s irá atacá-los.\n\n", defender, B, attacker);
 
-    time_t timestamp;
+    /* time_t timestamp;
     short int interval = 0.1;
     printf("A colocar o barco 1\n");
     place_boat(1, 1, 'H', 'P', &brd);
@@ -642,13 +678,13 @@ int main(void)
     place_boat(6, 6, 'V', 'S', &brd);
     timestamp = time(NULL) + interval;
     while (timestamp >= time(NULL))
-      ;
+      ; */
 
     // Variáveis auxiliares.
     char boatType, dir;
     int boatSize, x, y;
 
-    /* for (int i = 0; i < B; i++)
+    for (int i = 0; i < B; i++)
     {
       // While "checkBoatPlacement" is false (0), program will keep asking for valid boat info
       int checkBoatPlacement = 0;
@@ -658,7 +694,7 @@ int main(void)
       {
         print_board(N, M, brd.board, 1);
 
-        printf("\n%s, restam colocar %d navios.\n--- Barco %d ---\n", defender, B - brd.numBoatsAfloat, i);
+        printf("\n%s, restam colocar %d navios.\n-------------------------------| Barco %d |-------------------------------\n", defender, B - brd.numBoatsAfloat, i);
 
         // Tipo de barco e nº de posições.
         printf("Tipo de barco ('P', 'N', 'C' ou 'S'): ");
@@ -717,7 +753,7 @@ int main(void)
           printf("Ser-lhe-ão pedidas as informações novamente...\n");
         }
       }
-    } */
+    }
 
     system("clear");
 
@@ -741,7 +777,10 @@ int main(void)
       {
         printf("\nATENÇÃO: %s já ganhou o jogo, dado que visualizou o tabuleiro do mesmo.", defender);
       }
-      printf("\n%s, você tem %d jogadas e restam afundar %d navios.\nCaso deseje (declarando a vitória a %s):\n - Sair, digite \"-1\" numa das coordenadas.\n - Ver todos os navios (o jogo continuará), digite \"-2\" numa das coordenadas.\n", attacker, availablePlays, brd.numBoatsAfloat, defender);
+
+      printf("\n%s, você tem %d jogadas e restam afundar %d navios ", attacker, availablePlays, brd.numBoatsAfloat);
+      listBoatsAfloat(brd);
+      printf(".\nCaso deseje (declarando a vitória a %s):\n - Sair, digite \"-1\" numa das coordenadas.\n - Ver todos os navios (o jogo continuará), digite \"-2\" numa das coordenadas.\n", defender);
       printf("Coordenada a atacar:\n");
       printf("x: ");
       scanf("%d", &targetX);

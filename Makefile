@@ -11,4 +11,4 @@ $(OUTPUT) : $(ENTRY)
 	$(COMPILER) -o $@ $<
 
 clean :
-	rm *.o *.exe *.out
+	rm *.o *.exe *.out *.txt
