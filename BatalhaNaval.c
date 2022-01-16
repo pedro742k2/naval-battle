@@ -335,6 +335,8 @@ int place_boat(int x1, int y1, int dir, char type, Board *board)
     board->numBoats++;
     board->numBoatsAfloat++;
   }
+
+  return 0;
 }
 
 /**

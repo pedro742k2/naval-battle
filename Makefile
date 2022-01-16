@@ -8,7 +8,7 @@ execute : $(OUTPUT)
 	./$<
 
 $(OUTPUT) : $(ENTRY)
-	$(COMPILER) -o $@ $<
+	$(COMPILER) -o $@ $< -Wall -std=c99
 
 clean :
 	rm *.o *.exe *.out *.txt
