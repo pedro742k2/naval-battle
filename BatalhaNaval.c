@@ -15,6 +15,12 @@
 #define N 8
 #define M 8
 
+/* Cores para o terminal */
+#define ANSI_COLOR_RED "\x1b[31m"
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_RESET "\x1b[0m"
+
 /**Representa uma coordenada**/
 typedef struct
 {
@@ -593,6 +599,53 @@ int askNewGame(void)
   return 1;
 }
 
+/**
+ * Function: printInfo
+ * 
+ * Imprime uma mensagem com um formato especial, conforme sucesso ou erro.
+ * 
+ * message: Mensagem a ser impressa.
+ * error: 2 se for uma mensagem de aviso, 1 se for de erro e 0 se for de sucesso.
+ */
+void printInfo(char *message, int error)
+{
+  int messageLength = strlen(message);
+
+  // Ciclo que imprime os traços do tamanho da string
+  for (int i = 0; i < messageLength; i++)
+  {
+    printf("-");
+  }
+
+  // Seleciona uma cor com base no parametro formal "error"
+  switch (error)
+  {
+  case 0:
+    printf(ANSI_COLOR_GREEN);
+    break;
+
+  case 1:
+    printf(ANSI_COLOR_RED);
+    break;
+
+  case 2:
+    printf(ANSI_COLOR_YELLOW);
+    break;
+
+  default:
+    print(ANSI_COLOR_RESET);
+  }
+
+  printf("\n%s\n" ANSI_COLOR_RESET, message);
+
+  for (int i = 0; i < messageLength; i++)
+  {
+    printf("-");
+  }
+
+  printf("\n");
+}
+
 // ? colocaNavio();
 int main(void)
 {
@@ -604,8 +657,9 @@ int main(void)
   // Nome dos jogadores
   char player1[100] = "", player2[100] = "";
 
+  // Pedido da idenficiação dos jogadores.
   printf("----------------------------------------------------------------------------------\n");
-  printf("Bem-vindos. Primeiramente, insiram os nomes dos jogadores (Máximo 100 caracteres):\n");
+  printf("Bem-vindos. Primeiramente, insiram os nomes dos jogadores (" ANSI_COLOR_YELLOW "Máximo 100 caracteres" ANSI_COLOR_RESET "):\n");
   printf("Jogador defensor: ");
   fgets(player1, 100, stdin);
   printf("Jogador atacante: ");
@@ -646,36 +700,36 @@ int main(void)
     }
 
     system("clear");
-    printf("Partida %d/2.\n%s irá proceder à colocação dos %d navios e %s irá atacá-los.\n\n", plays + 1, defender, B, attacker);
+    printf("Partida " ANSI_COLOR_GREEN "%d/2" ANSI_COLOR_RESET ".\n%s irá proceder à colocação dos " ANSI_COLOR_GREEN "%d" ANSI_COLOR_RESET " navios e %s irá atacá-los.\n\n", plays + 1, defender, B, attacker);
 
     /* time_t timestamp;
     short int interval = 0.1;
-    printf("A colocar o barco 1\n");
+    printf("A colocar o barco 1...\n");
     place_boat(1, 1, 'H', 'P', &brd);
     timestamp = time(NULL) + interval;
     while (timestamp >= time(NULL))
       ;
-    printf("A colocar o barco 2\n");
+    printf("A colocar o barco 2...\n");
     place_boat(7, 1, 'V', 'N', &brd);
     timestamp = time(NULL) + interval;
     while (timestamp >= time(NULL))
       ;
-    printf("A colocar o barco 3\n");
+    printf("A colocar o barco 3...\n");
     place_boat(2, 3, 'H', 'C', &brd);
     timestamp = time(NULL) + interval;
     while (timestamp >= time(NULL))
       ;
-    printf("A colocar o barco 4\n");
+    printf("A colocar o barco 4...\n");
     place_boat(0, 4, 'V', 'C', &brd);
     timestamp = time(NULL) + interval;
     while (timestamp >= time(NULL))
       ;
-    printf("A colocar o barco 5\n");
+    printf("A colocar o barco 5...\n");
     place_boat(3, 5, 'H', 'S', &brd);
     timestamp = time(NULL) + interval;
     while (timestamp >= time(NULL))
       ;
-    printf("A colocar o barco 6\n");
+    printf("A colocar o barco 6...\n");
     place_boat(6, 6, 'V', 'S', &brd);
     timestamp = time(NULL) + interval;
     while (timestamp >= time(NULL))
@@ -695,7 +749,7 @@ int main(void)
       {
         print_board(N, M, brd.board, 1);
 
-        printf("\n%s, restam colocar %d navios.\n-------------------------------| Barco %d |-------------------------------\n", defender, B - brd.numBoatsAfloat, i);
+        printf("\n%s, restam colocar " ANSI_COLOR_GREEN "%d" ANSI_COLOR_RESET " navios.\n-------------------------------| Barco %d |-------------------------------\n", defender, B - brd.numBoatsAfloat, i);
 
         // Tipo de barco e nº de posições.
         printf("Tipo de barco ('P', 'N', 'C' ou 'S'): ");
@@ -703,9 +757,36 @@ int main(void)
 
         boatSize = typeToSize(boatType);
 
-        // Direção do barco;
-        printf("Indique a direção do barco.\n('H' - Horizontal ou 'V' - Vertical): ");
-        scanf(" %c", &dir);
+        if (boatSize == -1)
+        {
+          system("clear");
+
+          printInfo("Tipo de barco inválido. Por favor, adicione um dos disponíveis.", 1);
+
+          continue;
+        }
+
+        if (!checkTypeAvailability(brd, boatType))
+        {
+          system("clear");
+
+          printInfo("Tipo de barco indisponível. Por favor, adicione um dos disponíveis.", 1);
+
+          continue;
+        }
+
+        /* // Direção do barco;
+        printf("\nIndique a direção do barco.\n('H' - Horizontal ou 'V' - Vertical): ");
+        scanf(" %c", &dir); */
+
+        dir = ' ';
+        while (dir != 'H' && dir != 'V')
+        {
+          printf("\nIndique a direção do barco.\n('H' - Horizontal ou 'V' - Vertical): ");
+          scanf(" %c", &dir);
+
+          printInfo("Tipo de direção inválida. Por favor, indique uma das disponíveis.", 1);
+        }
 
         // Coordenadas iniciais.
         printf("\nConsiderando o barco '%c' com %d posições, insira as coordenadas iniciais.\nO tabuleiro tem %d linhas e %d colunas, ou seja:\n\"x inicial\" deve estar compreendido entre 0 e %d;\n\"y inicial\" deve estar compreendido entre 0 e %d:\n", boatType, boatSize, N, M, N - 1, N - 1);
@@ -715,43 +796,30 @@ int main(void)
         scanf("%d", &y);
 
         system("clear");
-        printf("-------------------------------------------------------------------\n");
-        if (!checkTypeAvailability(brd, boatType))
+
+        int boatPlacement = place_boat(x, y, dir, boatType, &brd);
+
+        switch (boatPlacement)
         {
-          printf("Tipo de barco indisponível. Por favor, adicione um dos disponíveis.\n");
-        }
-        else
-        {
-          int boatPlacement = place_boat(x, y, dir, boatType, &brd);
+        case -1:
+          printInfo("Uma das posições já se encontra ocupada. Por favor, adicione uma posição disponível.", 1);
+          break;
 
-          switch (boatPlacement)
-          {
-          case -1:
-            printf("Uma das posições já se encontra ocupada.\n");
-            break;
+        case -2:
+          printInfo("Coordenadas inválidas. Por favor, adicione uma coordenada válida.", 1);
+          break;
 
-          case -2:
-            printf("Coordenadas inválidas\n");
-            break;
+        case -3:
+          printInfo("Direção inválida. Por favor, adicione uma direção válida.", 1);
+          break;
 
-          case -3:
-            printf("Direção inválida\n");
-            break;
+        case -4:
+          printInfo("Tipo de barco inválido. Por favor, adicione um dos disponíveis.", 1);
+          break;
 
-          case -4:
-            printf("Tipo de barco inválido\n");
-            break;
-
-          default:
-            printf("Barco colocado com sucesso.\n");
-            checkBoatPlacement = 1;
-          }
-        }
-        printf("-------------------------------------------------------------------\n\n");
-
-        if (!checkBoatPlacement)
-        {
-          printf("Ser-lhe-ão pedidas as informações novamente...\n");
+        default:
+          printInfo("Barco colocado com sucesso.", 0);
+          checkBoatPlacement = 1;
         }
       }
     }
@@ -776,12 +844,12 @@ int main(void)
 
       if (surrender)
       {
-        printf("\nATENÇÃO: %s já ganhou o jogo, dado que visualizou o tabuleiro do mesmo.", defender);
+        printf(ANSI_COLOR_YELLOW "\nATENÇÃO: %s já ganhou o jogo, dado você visualizou o tabuleiro inimigo." ANSI_COLOR_RESET, defender);
       }
 
-      printf("\nPartida %d/2. %s, você tem %d jogadas e restam afundar %d navios ", plays + 1, attacker, availablePlays, brd.numBoatsAfloat);
+      printf("\nPartida " ANSI_COLOR_GREEN "%d/2" ANSI_COLOR_RESET ". %s, você tem " ANSI_COLOR_GREEN "%d" ANSI_COLOR_RESET " jogadas e restam afundar " ANSI_COLOR_GREEN "%d" ANSI_COLOR_RESET " navios ", plays + 1, attacker, availablePlays, brd.numBoatsAfloat);
       listBoatsAfloat(brd);
-      printf(".\nCaso deseje (declarando a vitória a %s):\n - Sair, digite \"-1\" numa das coordenadas.\n - Ver todos os navios (o jogo continuará), digite \"-2\" numa das coordenadas.\n", defender);
+      printf(".\nCaso deseje (declarando a vitória a %s):\n - Sair, digite \"" ANSI_COLOR_YELLOW "-1" ANSI_COLOR_RESET "\" numa das coordenadas.\n - Ver todos os navios (o jogo continuará), digite \"" ANSI_COLOR_YELLOW "-2" ANSI_COLOR_RESET "\" numa das coordenadas.\n", defender);
       printf("Coordenada a atacar:\n");
       printf("x: ");
       scanf("%d", &targetX);
@@ -798,7 +866,7 @@ int main(void)
         while (confirmSurrender != 'S' && confirmSurrender != 'N')
         {
           system("clear");
-          printf("Deseja realmente sair? [S/N]: ");
+          printf(ANSI_COLOR_YELLOW "Deseja realmente sair? [S/N]: " ANSI_COLOR_RESET);
           scanf(" %c", &confirmSurrender);
         }
 
@@ -808,7 +876,7 @@ int main(void)
           continue;
         }
 
-        printf("%s saiu do jogo.\n", attacker);
+        printf(ANSI_COLOR_RED "%s saiu do jogo.\n" ANSI_COLOR_RESET, attacker);
         exit = 1;
         break;
       }
@@ -820,7 +888,7 @@ int main(void)
         while (confirmSurrender != 'S' && confirmSurrender != 'N')
         {
           system("clear");
-          printf("Quer realmente desistir do jogo ao ver o tabuleiro inimigo?\nO jogo continuará de qualquer forma.\nDeseja desistir [S/N]: ");
+          printf(ANSI_COLOR_YELLOW "Quer realmente desistir do jogo ao ver o tabuleiro inimigo?" ANSI_COLOR_RESET "\nO jogo continuará de qualquer forma.\nDeseja desistir [S/N]: ");
           scanf(" %c", &confirmSurrender);
         }
 
@@ -839,11 +907,11 @@ int main(void)
         while (strcmp(continueGame, "ok"))
         {
           system("clear");
-          printf("ATENÇÃO: %s, você perdeu o jogo. O jogo continuará de qualquer forma.\nO tabuleiro com os navios de %s será exibido.\n\n", attacker, defender);
+          printf(ANSI_COLOR_YELLOW "ATENÇÃO: %s, você perdeu o jogo." ANSI_COLOR_RESET " O jogo continuará de qualquer forma.\nO tabuleiro com os navios de %s será exibido.\n\n", attacker, defender);
 
           print_board(N, M, cloneBoard.board, 1);
 
-          printf("\nEscreva \"ok\" para continuar: ");
+          printf("\nEscreva \"" ANSI_COLOR_GREEN "ok" ANSI_COLOR_RESET "\" para continuar: ");
           scanf(" %s", continueGame);
         }
 
@@ -854,32 +922,31 @@ int main(void)
       system("clear");
 
       int targetState = target(targetX, targetY, &brd);
-      printf("---------------------------------------------\n");
+
       switch (targetState)
       {
       case 0:
-        printf("Esta coordenada já foi atacada anteriormente.\n");
+        printInfo("Esta coordenada já foi atacada anteriormente.", 2);
         break;
 
       case 1:
-        printf("Acertou num navio. Ainda não o afundou.\n");
+        printInfo("Acertou num navio. Ainda não o afundou.", 0);
         availablePlays--;
         break;
 
       case -1:
-        printf("Sem sucesso.\n");
+        printInfo("Sem sucesso.", 2);
         availablePlays--;
         break;
 
       case -2:
-        printf("Coordenada inválida.\n");
+        printInfo("Coordenada inválida.", 1);
         break;
 
       default:
-        printf("Barco afundado.\n");
+        printInfo("Barco afundado.", 0);
         availablePlays--;
       }
-      printf("---------------------------------------------\n\n");
     }
 
     if (!plays)
@@ -891,25 +958,26 @@ int main(void)
       {
         system("clear");
 
-        printf("Parabéns %s, você ganhou a %dª ronda.\n", (!brd.numBoatsAfloat && !surrender && !exit) ? attacker : defender, plays + 1);
+        // Parabeliza o jogador vencedor.
+        printf(ANSI_COLOR_GREEN "Parabéns %s, você ganhou a %dª ronda.\n" ANSI_COLOR_RESET, (!brd.numBoatsAfloat && !surrender && !exit) ? attacker : defender, plays + 1);
 
-        printf("\nEscreva \"ok\" para continuar: ");
+        printf("\nEscreva \"" ANSI_COLOR_GREEN "ok" ANSI_COLOR_RESET "\" para continuar: ");
         scanf(" %s", continueGame);
+      }
 
-        if (exit)
+      if (exit)
+      {
+        // Pergunta se o jogador deseja começar um novo jogo.
+        if (!askNewGame())
         {
-          // Pergunta se o jogador deseja começar um novo jogo.
-          if (!askNewGame())
-          {
-            // Caso não, sai
-            system("clear");
-            return 0;
-          }
-
-          // Se sim, começa um novo jogo reiniciando o número de jogadas.
-          plays = 0;
-          continue;
+          // Caso não, sai
+          system("clear");
+          return 0;
         }
+
+        // Se sim, começa um novo jogo reiniciando o número de jogadas.
+        plays = 0;
+        continue;
       }
 
       plays++;
