@@ -371,7 +371,6 @@ char check_sink(int x, int y, Board *board)
   }
 
   // Caso não tenha sido atingido nenhum barco (ou seja, nenhum afundado).
-  // if (board->board[x][y] == ' ')
   if (board->board[y][x] == ' ')
   {
     return 'F';
@@ -633,7 +632,7 @@ void printInfo(char *message, int error)
     break;
 
   default:
-    print(ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_RESET);
   }
 
   printf("\n%s\n" ANSI_COLOR_RESET, message);
@@ -646,7 +645,6 @@ void printInfo(char *message, int error)
   printf("\n");
 }
 
-// ? colocaNavio();
 int main(void)
 {
   Board brd;
@@ -775,9 +773,9 @@ int main(void)
           continue;
         }
 
-        /* // Direção do barco;
+        // Direção do barco;
         printf("\nIndique a direção do barco.\n('H' - Horizontal ou 'V' - Vertical): ");
-        scanf(" %c", &dir); */
+        scanf(" %c", &dir);
 
         dir = ' ';
         while (dir != 'H' && dir != 'V')
@@ -785,7 +783,10 @@ int main(void)
           printf("\nIndique a direção do barco.\n('H' - Horizontal ou 'V' - Vertical): ");
           scanf(" %c", &dir);
 
-          printInfo("Tipo de direção inválida. Por favor, indique uma das disponíveis.", 1);
+          if (dir != 'H' && dir != 'V')
+          {
+            printInfo("Tipo de direção inválida. Por favor, indique uma das disponíveis.", 1);
+          }
         }
 
         // Coordenadas iniciais.
