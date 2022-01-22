@@ -128,8 +128,6 @@ void print_board(int n, int m, char board[n][m], int flag)
     }
     else // Esconde os barcos
     {
-      //Implementar
-
       char charToPrint;
       for (int j = 0; j < n; j++)
       {
@@ -161,11 +159,6 @@ void print_board(int n, int m, char board[n][m], int flag)
  **/
 int typeToSize(char type)
 {
-  //Implementar
-
-  /*
-  A estrutura Switch case, neste caso, dispensa de "break statements" dado que o "return" termina a execução da função nesse mesmo ponto.
-  */
   switch (type)
   {
   case 'P':
@@ -207,7 +200,6 @@ int typeToSize(char type)
  **/
 void init_boat(Boat *b, char type, Position xy, char dir)
 {
-  //Implementar
   int boatSize = typeToSize(type);
 
   b->type = type;
@@ -246,18 +238,15 @@ void init_boat(Boat *b, char type, Position xy, char dir)
  **/
 int check_free(int n, int m, Boat *boat, char board[n][m])
 {
-  //Implementar
-  int isFree = 1;
-
   for (int i = 0; i < boat->tSize; i++)
   {
     if (board[boat->coord[i].pos.y][boat->coord[i].pos.x] != ' ')
     {
-      isFree = 0;
+      return 0;
     }
   }
 
-  return isFree;
+  return 1;
 }
 
 /** 
@@ -280,11 +269,13 @@ int check_free(int n, int m, Boat *boat, char board[n][m])
  **/
 int place_boat(int x1, int y1, int dir, char type, Board *board)
 {
+  // Valida tipo de barco
   if (type != 'P' && type != 'N' && type != 'C' && type != 'S')
   {
     return -4;
   }
 
+  // Valida tipo de direção
   if (dir != 'H' && dir != 'V')
   {
     return -3;
@@ -296,51 +287,47 @@ int place_boat(int x1, int y1, int dir, char type, Board *board)
   pos.y = y1;
   init_boat(&newBoat, type, pos, dir);
 
-  //Implementar
   int boatSize = newBoat.tSize;
+
+  // Verifica se as posições estão livres
+  if (!check_free(N, M, &newBoat, board->board))
+  {
+    return -1;
+  }
 
   if (dir == 'H')
   {
+    // Valida as coordenadas na horizontal
     if (x1 < 0 || x1 + boatSize > M || y1 < 0 || y1 >= N)
     {
       return -2;
     }
 
-    if (!check_free(N, M, &newBoat, board->board))
-    {
-      return -1;
-    }
-
+    // Coloca o barco no tabuleiro (horizontal)
     for (int i = 0; i < boatSize; i++)
     {
       board->board[y1][x1 + i] = type;
     }
-
-    board->boats[board->numBoats] = newBoat;
-    board->numBoats++;
-    board->numBoatsAfloat++;
   }
   else
   {
-    if (!check_free(N, M, &newBoat, board->board))
-    {
-      return -1;
-    }
-
+    // Verifica as coordenadas na vertical
     if (x1 < 0 || x1 >= M || y1 < 0 || y1 + boatSize > N)
     {
       return -2;
     }
 
+    // Coloca o barco no tabuleiro (vertical)
     for (int i = 0; i < boatSize; i++)
     {
       board->board[y1 + i][x1] = type;
     }
-
-    board->boats[board->numBoats] = newBoat;
-    board->numBoats++;
-    board->numBoatsAfloat++;
   }
+
+  // Adiciona o barco à estrutura "Board"
+  board->boats[board->numBoats] = newBoat;
+  board->numBoats++;
+  board->numBoatsAfloat++;
 
   return 0;
 }
@@ -362,8 +349,6 @@ int place_boat(int x1, int y1, int dir, char type, Board *board)
  **/
 char check_sink(int x, int y, Board *board)
 {
-  //Implementar
-
   // Validação das coordenadas.
   if (x < 0 || y < 0 || x >= N || y >= M)
   {
@@ -389,7 +374,7 @@ char check_sink(int x, int y, Board *board)
         // Verifica se a coordenada já havia sido atingida. Se não, atualiza os valores da mesma.
         if (targetedBoat->coord[j].afloat)
         {
-          // Decrementa o número posições não afundadas.
+          // Decrementa o número posições do barco não afundadas.
           targetedBoat->afloat--;
           // Indica que a coordenada foi afundada.
           targetedBoat->coord[j].afloat = 0;
@@ -400,7 +385,7 @@ char check_sink(int x, int y, Board *board)
             // Decrementa o número de barcos não afundados.
             board->numBoatsAfloat--;
             // Retorna o tipo do barco.
-            return board->board[y][x];
+            return targetedBoat->type;
           }
         }
 
@@ -436,10 +421,10 @@ char check_sink(int x, int y, Board *board)
  **/
 int target(int x, int y, Board *board)
 {
-  //Implementar
   int checkSink = check_sink(x, y, board);
 
   Boat *targetedBoat;
+
   // Encontra o barco atingido
   for (int i = 0; i < B; i++)
   {
@@ -505,7 +490,7 @@ int target(int x, int y, Board *board)
  **/
 void listBoatsAfloat(Board board)
 {
-  // Variável auxiliar para verificar o primeiro barco não afundado, com finalidade de formatação
+  // Variável auxiliar para verificar o primeiro barco não afundado, com finalidade de formatação (não colocar "," no início do primeiro barco)
   int firstBoatAfloat = 1;
 
   printf("(");
@@ -544,7 +529,7 @@ int checkTypeAvailability(Board board, char type)
 {
   /**
    *  maxOfType: Número máximo de cada tipo de barco
-   * typeAccumulator: Número de instâncias do tipo dado no tabuleiro
+   * typeAccumulator: Número de instâncias do tipo de barco no tabuleiro
    */
   int maxOfType, typeAccumulator = 0;
 
@@ -559,7 +544,7 @@ int checkTypeAvailability(Board board, char type)
     }
   }
 
-  // Se "typeAccumulator" >= "maxOfType", o tipo de barco não pode ser adicionado.
+  // Se "typeAccumulator" >= "maxOfType", o tipo de barco dado não pode ser adicionado.
   if (typeAccumulator >= maxOfType)
   {
     return 0;
@@ -580,12 +565,12 @@ int checkTypeAvailability(Board board, char type)
  **/
 int askNewGame(void)
 {
-  // Verifica se o jogador deseja começar um novo jogo.
   char newGame = ' ';
+
   // Ciclo irá repetir até que uma opção válida seja introduzida.
   while (newGame != 'S' && newGame != 'N')
   {
-    system("clear");
+    system("clear || cls");
     printf("Deseja começar um novo jogo [S/N]: ");
     scanf(" %c", &newGame);
   }
@@ -649,15 +634,14 @@ int main(void)
 {
   Board brd;
 
-  // Número de jogadas feitas (começa com 0 e acaba em 2).
+  // Número de partidas realizadas
   int plays = 0;
 
   // Nome dos jogadores
   char player1[100] = "", player2[100] = "";
 
-  // Pedido da idenficiação dos jogadores.
-  printf("----------------------------------------------------------------------------------\n");
-  printf("Bem-vindos. Primeiramente, insiram os nomes dos jogadores (" ANSI_COLOR_YELLOW "Máximo 100 caracteres" ANSI_COLOR_RESET "):\n");
+  // Pedido da idenficiação dos jogadores
+  printInfo("Bem-vindos. Primeiramente, insiram os nomes dos jogadores (Máximo 100 caracteres)", -1);
   printf("Jogador defensor: ");
   fgets(player1, 100, stdin);
   printf("Jogador atacante: ");
@@ -697,7 +681,7 @@ int main(void)
       strcpy(attacker, player1);
     }
 
-    system("clear");
+    system("clear || cls");
     printf("Partida " ANSI_COLOR_GREEN "%d/2" ANSI_COLOR_RESET ".\n%s irá proceder à colocação dos " ANSI_COLOR_GREEN "%d" ANSI_COLOR_RESET " navios e %s irá atacá-los.\n\n", plays + 1, defender, B, attacker);
 
     /* time_t timestamp;
@@ -733,16 +717,14 @@ int main(void)
     while (timestamp >= time(NULL))
       ; */
 
-    // Variáveis auxiliares.
     char boatType, dir;
     int boatSize, x, y;
 
     for (int i = 0; i < B; i++)
     {
-      // While "checkBoatPlacement" is false (0), program will keep asking for valid boat info
       int checkBoatPlacement = 0;
 
-      // Enquanto "checkBoatPlacement" for zero, continua a pedir novos dados.
+      // Enquanto "checkBoatPlacement" (informação inválida) for zero, continua a pedir novos dados.
       while (!checkBoatPlacement)
       {
         print_board(N, M, brd.board, 1);
@@ -757,7 +739,7 @@ int main(void)
 
         if (boatSize == -1)
         {
-          system("clear");
+          system("clear || cls");
 
           printInfo("Tipo de barco inválido. Por favor, adicione um dos disponíveis.", 1);
 
@@ -766,7 +748,7 @@ int main(void)
 
         if (!checkTypeAvailability(brd, boatType))
         {
-          system("clear");
+          system("clear || cls");
 
           printInfo("Tipo de barco indisponível. Por favor, adicione um dos disponíveis.", 1);
 
@@ -789,14 +771,34 @@ int main(void)
           }
         }
 
-        // Coordenadas iniciais.
+        // Pedido das coordenadas iniciais do barco a colocar
         printf("\nConsiderando o barco '%c' com %d posições, insira as coordenadas iniciais.\nO tabuleiro tem %d linhas e %d colunas, ou seja:\n\"x inicial\" deve estar compreendido entre 0 e %d;\n\"y inicial\" deve estar compreendido entre 0 e %d:\n", boatType, boatSize, N, M, N - 1, N - 1);
+
+        // Coordenada inicial "x" do barco
         printf("x inicial: ");
         scanf("%d", &x);
+        if (x < 0 || x >= N)
+        {
+          system("clear || cls");
+
+          printInfo("Tipo de coordenada inválida. Por favor, adicione uma disponível.", 1);
+
+          continue;
+        }
+
+        // Coordenada inicial "y" do barco
         printf("y inicial: ");
         scanf("%d", &y);
+        if (y < 0 || y >= M)
+        {
+          system("clear || cls");
 
-        system("clear");
+          printInfo("Tipo de coordenada inválida. Por favor, adicione uma disponível.", 1);
+
+          continue;
+        }
+
+        system("clear || cls");
 
         int boatPlacement = place_boat(x, y, dir, boatType, &brd);
 
@@ -825,7 +827,7 @@ int main(void)
       }
     }
 
-    system("clear");
+    system("clear || cls");
 
     /** Variáveis auxiliares:
      * availablePlays: Jogadas disponíveis;
@@ -848,9 +850,16 @@ int main(void)
         printf(ANSI_COLOR_YELLOW "\nATENÇÃO: %s já ganhou o jogo, dado você visualizou o tabuleiro inimigo." ANSI_COLOR_RESET, defender);
       }
 
+      // Mensagem especialmente formatada, com toda a informação essencial para o atacante
       printf("\nPartida " ANSI_COLOR_GREEN "%d/2" ANSI_COLOR_RESET ". %s, você tem " ANSI_COLOR_GREEN "%d" ANSI_COLOR_RESET " jogadas e restam afundar " ANSI_COLOR_GREEN "%d" ANSI_COLOR_RESET " navios ", plays + 1, attacker, availablePlays, brd.numBoatsAfloat);
+
+      // Lista o número de barcos disponíveis, na mesma linha do resto da mensagem
       listBoatsAfloat(brd);
+
+      // Continua a mensagem
       printf(".\nCaso deseje (declarando a vitória a %s):\n - Sair, digite \"" ANSI_COLOR_YELLOW "-1" ANSI_COLOR_RESET "\" numa das coordenadas.\n - Ver todos os navios (o jogo continuará), digite \"" ANSI_COLOR_YELLOW "-2" ANSI_COLOR_RESET "\" numa das coordenadas.\n", defender);
+
+      // Coordenadas a atacar
       printf("Coordenada a atacar:\n");
       printf("x: ");
       scanf("%d", &targetX);
@@ -866,14 +875,14 @@ int main(void)
         // Ciclo irá repetir até que uma opção válida seja introduzida.
         while (confirmSurrender != 'S' && confirmSurrender != 'N')
         {
-          system("clear");
+          system("clear || cls");
           printf(ANSI_COLOR_YELLOW "Deseja realmente sair? [S/N]: " ANSI_COLOR_RESET);
           scanf(" %c", &confirmSurrender);
         }
 
         if (confirmSurrender == 'N')
         {
-          system("clear");
+          system("clear || cls");
           continue;
         }
 
@@ -888,14 +897,14 @@ int main(void)
         // Ciclo irá repetir até que uma opção válida seja introduzida.
         while (confirmSurrender != 'S' && confirmSurrender != 'N')
         {
-          system("clear");
+          system("clear || cls");
           printf(ANSI_COLOR_YELLOW "Quer realmente desistir do jogo ao ver o tabuleiro inimigo?" ANSI_COLOR_RESET "\nO jogo continuará de qualquer forma.\nDeseja desistir [S/N]: ");
           scanf(" %c", &confirmSurrender);
         }
 
         if (confirmSurrender == 'N')
         {
-          system("clear");
+          system("clear || cls");
           continue;
         }
 
@@ -907,7 +916,7 @@ int main(void)
         // Enquanto o input for diferente de "ok"...
         while (strcmp(continueGame, "ok"))
         {
-          system("clear");
+          system("clear || cls");
           printf(ANSI_COLOR_YELLOW "ATENÇÃO: %s, você perdeu o jogo." ANSI_COLOR_RESET " O jogo continuará de qualquer forma.\nO tabuleiro com os navios de %s será exibido.\n\n", attacker, defender);
 
           print_board(N, M, cloneBoard.board, 1);
@@ -916,11 +925,11 @@ int main(void)
           scanf(" %s", continueGame);
         }
 
-        system("clear");
+        system("clear || cls");
         continue;
       }
 
-      system("clear");
+      system("clear || cls");
 
       int targetState = target(targetX, targetY, &brd);
 
@@ -957,7 +966,7 @@ int main(void)
       // Enquanto o input for diferente de "ok"...
       while (strcmp(continueGame, "ok"))
       {
-        system("clear");
+        system("clear || cls");
 
         // Parabeliza o jogador vencedor.
         printf(ANSI_COLOR_GREEN "Parabéns %s, você ganhou a %dª ronda.\n" ANSI_COLOR_RESET, (!brd.numBoatsAfloat && !surrender && !exit) ? attacker : defender, plays + 1);
@@ -972,7 +981,7 @@ int main(void)
         if (!askNewGame())
         {
           // Caso não, sai
-          system("clear");
+          system("clear || cls");
           return 0;
         }
 
@@ -989,7 +998,7 @@ int main(void)
       if (!askNewGame())
       {
         // Caso não, sai
-        system("clear");
+        system("clear || cls");
         return 0;
       }
 

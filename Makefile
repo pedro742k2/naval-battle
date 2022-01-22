@@ -2,7 +2,7 @@
 
 COMPILER = gcc
 OUTPUT = output.exe
-ENTRY = BatalhaNaval.c
+ENTRY = a48277_a48389.c
 
 execute : $(OUTPUT)
 	./$<
