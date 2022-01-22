@@ -54,11 +54,11 @@
     - Coordenadas que foram atacadas **com sucesso** são representadas por um asterisco (**\***);
     - Coordenadas que foram atacadas **sem sucesso** são representadas pela letra "**F**";
     - **Obs:** Coordenadas pertencentes a um barco afundado são representadas pela letra "**A**".
-- Para cada barco colocado, será adicionado ao vetor "array board" da estrutura "Board", a primeira letra do tipo do barco nas posições que este ocupa:
-    - "P" para porta-aviões;
-    - "N" para navios-tanque;
-    - "C" para contratorpedeiros;
-    - "S" para submarinos.
+- Para cada barco colocado, será adicionado ao vetor "board" da estrutura "Board", a primeira letra do tipo do barco nas posições que este ocupa:
+    - "**P**" para porta-aviões;
+    - "**N**" para navios-tanque;
+    - "**C**" para contratorpedeiros;
+    - "**S**" para submarinos.
 - Quando um navio é afundado, uma mensagem é exibida a informar que tipo de navio afundou;
 
 ### Estruturas de dados
