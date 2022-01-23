@@ -101,14 +101,7 @@ void init_board(int n, int m, Board *b)
 
 void print_board(int n, int m, char board[n][m], int flag)
 {
-  printf("   ");
-  for (int i = 0; i < M; i++)
-  {
-    printf(" %d  ", i);
-  }
-  printf("\n");
-
-  printf("  +");
+  printf("+");
   for (int j = 0; j < n; j++)
   {
     printf("---+");
@@ -117,7 +110,7 @@ void print_board(int n, int m, char board[n][m], int flag)
 
   for (int i = 0; i < m; i++)
   {
-    printf("%d |", i);
+    printf("|");
     if (flag) //Mostra tudo
     {
       for (int j = 0; j < n; j++)
@@ -137,7 +130,7 @@ void print_board(int n, int m, char board[n][m], int flag)
       printf("\n");
     }
 
-    printf("  +");
+    printf("+");
     for (int j = 0; j < n; j++)
     {
       printf("---+");
@@ -570,7 +563,6 @@ int askNewGame(void)
   // Ciclo irá repetir até que uma opção válida seja introduzida.
   while (newGame != 'S' && newGame != 'N')
   {
-    system("clear || cls");
     printf("Deseja começar um novo jogo [S/N]: ");
     scanf(" %c", &newGame);
   }
@@ -595,6 +587,7 @@ void printInfo(char *message, int error)
 {
   int messageLength = strlen(message);
 
+  printf("\n");
   // Ciclo que imprime os traços do tamanho da string
   for (int i = 0; i < messageLength; i++)
   {
@@ -627,7 +620,85 @@ void printInfo(char *message, int error)
     printf("-");
   }
 
-  printf("\n");
+  printf("\n\n");
+}
+
+/**
+ * Function: confirmExit
+ * 
+ * Verifica se o jogador deseja sair ou render-se.
+ * 
+ * valueToCheck: Valor a verificar
+ * cloneBoard: Clone do tabuleiro com os barcos originais
+ * attacker: Nome do jogador atacante
+ * defender: Nome do jogador defensor
+ * 
+ * returns:
+ *  2 caso o jogador deseje render-se (e visualize o tabuleiro inimigo)
+ *  1 caso deseje sair
+ *  0 caso anule a decisão de sair/render-se
+ * 
+ **/
+int confirmExit(int valueToCheck, Board cloneBoard, char *attacker, char *defender)
+{
+  int exit = 0;
+
+  // Caso o jogador decida sair do jogo.
+  if (valueToCheck == -1)
+  {
+    // Confirma se o jogador realmente quer desistir.
+    char confirmSurrender = ' ';
+    // Ciclo irá repetir até que uma opção válida seja introduzida.
+    while (confirmSurrender != 'S' && confirmSurrender != 'N')
+    {
+      printf(ANSI_COLOR_YELLOW "Deseja realmente sair? [S/N]: " ANSI_COLOR_RESET);
+      scanf(" %c", &confirmSurrender);
+    }
+
+    if (confirmSurrender == 'N')
+    {
+      return 0;
+    }
+
+    printf(ANSI_COLOR_RED "%s saiu do jogo.\n" ANSI_COLOR_RESET, attacker);
+
+    exit = 1;
+  }
+  else if (valueToCheck == -2)
+  {
+    // Confirma se o jogador realmente quer desistir.
+    char confirmSurrender = ' ';
+    // Ciclo irá repetir até que uma opção válida seja introduzida.
+    while (confirmSurrender != 'S' && confirmSurrender != 'N')
+    {
+      printf(ANSI_COLOR_YELLOW "Quer realmente desistir do jogo ao ver o tabuleiro inimigo?" ANSI_COLOR_RESET "\nO jogo continuará de qualquer forma.\nDeseja desistir [S/N]: ");
+      scanf(" %c", &confirmSurrender);
+    }
+
+    if (confirmSurrender == 'N')
+    {
+      return 0;
+    }
+
+    // Caso o jogador desista, vendo o tabuleiro adversário.
+
+    char continueGame[10];
+    strcpy(continueGame, "");
+    // Enquanto o input for diferente de "ok"...
+    while (strcmp(continueGame, "ok"))
+    {
+      printf(ANSI_COLOR_YELLOW "ATENÇÃO: %s, você perdeu o jogo." ANSI_COLOR_RESET " O jogo continuará de qualquer forma.\nO tabuleiro com os navios de %s será exibido.\n\n", attacker, defender);
+
+      print_board(N, M, cloneBoard.board, 1);
+
+      printf("\nEscreva \"" ANSI_COLOR_GREEN "ok" ANSI_COLOR_RESET "\" para continuar: ");
+      scanf(" %s", continueGame);
+    }
+
+    exit = 2;
+  }
+
+  return exit;
 }
 
 int main(void)
@@ -681,66 +752,51 @@ int main(void)
       strcpy(attacker, player1);
     }
 
-    system("clear || cls");
     printf("Partida " ANSI_COLOR_GREEN "%d/2" ANSI_COLOR_RESET ".\n%s irá proceder à colocação dos " ANSI_COLOR_GREEN "%d" ANSI_COLOR_RESET " navios e %s irá atacá-los.\n\n", plays + 1, defender, B, attacker);
 
-    /* time_t timestamp;
-    short int interval = 0.1;
-    printf("A colocar o barco 1...\n");
-    place_boat(1, 1, 'H', 'P', &brd);
-    timestamp = time(NULL) + interval;
-    while (timestamp >= time(NULL))
-      ;
-    printf("A colocar o barco 2...\n");
-    place_boat(7, 1, 'V', 'N', &brd);
-    timestamp = time(NULL) + interval;
-    while (timestamp >= time(NULL))
-      ;
-    printf("A colocar o barco 3...\n");
-    place_boat(2, 3, 'H', 'C', &brd);
-    timestamp = time(NULL) + interval;
-    while (timestamp >= time(NULL))
-      ;
-    printf("A colocar o barco 4...\n");
-    place_boat(0, 4, 'V', 'C', &brd);
-    timestamp = time(NULL) + interval;
-    while (timestamp >= time(NULL))
-      ;
-    printf("A colocar o barco 5...\n");
-    place_boat(3, 5, 'H', 'S', &brd);
-    timestamp = time(NULL) + interval;
-    while (timestamp >= time(NULL))
-      ;
-    printf("A colocar o barco 6...\n");
-    place_boat(6, 6, 'V', 'S', &brd);
-    timestamp = time(NULL) + interval;
-    while (timestamp >= time(NULL))
-      ; */
-
-    char boatType, dir;
+    /** 
+     * Variáveis auxiliares:
+     *  boatType: Armazena o tipo de barco temporariamente
+     *  dir: Armazena a direção do barco temporariamente
+     *  defExit: Indica se o jogador defensor decidiu sair do jogo
+     *  boatSize: Armazena o tamanho do barco para fins de validação
+     *  (x, y): Coordenadas iniciais do barco a ser colocado
+     */
+    char boatType, dir, defExit = 0;
     int boatSize, x, y;
 
+    // Pede as informações dos "B" barcos
     for (int i = 0; i < B; i++)
     {
       int checkBoatPlacement = 0;
 
-      // Enquanto "checkBoatPlacement" (informação inválida) for zero, continua a pedir novos dados.
+      // Enquanto "checkBoatPlacement" (informação inválida) for zero, continua a pedir novos dados acerca do respetivo barco.
       while (!checkBoatPlacement)
       {
+        defExit = 0;
         print_board(N, M, brd.board, 1);
 
         printf("\n%s, restam colocar " ANSI_COLOR_GREEN "%d" ANSI_COLOR_RESET " navios.\n-------------------------------| Barco %d |-------------------------------\n", defender, B - brd.numBoatsAfloat, i);
+
+        printInfo("Nos inputs que se seguem, se assim o desejar, insira \"q\" para sair.", 2);
+        printf("\n");
 
         // Tipo de barco e nº de posições.
         printf("Tipo de barco ('P', 'N', 'C' ou 'S'): ");
         scanf(" %c", &boatType);
 
+        // Verifica se o jogador deseja sair
+        if (boatType == 'q')
+        {
+          printf("%s saiu do jogo.\n", defender);
+          defExit = 1;
+          break;
+        }
+
         boatSize = typeToSize(boatType);
 
         if (boatSize == -1)
         {
-          system("clear || cls");
-
           printInfo("Tipo de barco inválido. Por favor, adicione um dos disponíveis.", 1);
 
           continue;
@@ -748,18 +804,13 @@ int main(void)
 
         if (!checkTypeAvailability(brd, boatType))
         {
-          system("clear || cls");
-
           printInfo("Tipo de barco indisponível. Por favor, adicione um dos disponíveis.", 1);
 
           continue;
         }
 
-        // Direção do barco;
-        printf("\nIndique a direção do barco.\n('H' - Horizontal ou 'V' - Vertical): ");
-        scanf(" %c", &dir);
-
         dir = ' ';
+        // Pede a direção do barco até que a mesma seja válida ou que o jogador decida sair
         while (dir != 'H' && dir != 'V')
         {
           printf("\nIndique a direção do barco.\n('H' - Horizontal ou 'V' - Vertical): ");
@@ -767,9 +818,25 @@ int main(void)
 
           if (dir != 'H' && dir != 'V')
           {
+            // Verifica se o jogador deseja sair
+            if (dir == 'q')
+            {
+              printf("%s saiu do jogo.\n", defender);
+              defExit = 1;
+              break;
+            }
+
             printInfo("Tipo de direção inválida. Por favor, indique uma das disponíveis.", 1);
           }
         }
+
+        // Se na selação da direção o jogador decidir sair
+        if (defExit)
+        {
+          break;
+        }
+
+        printInfo("Nos inputs que se seguem, se assim o desejar, insira \"-1\" para sair.", 2);
 
         // Pedido das coordenadas iniciais do barco a colocar
         printf("\nConsiderando o barco '%c' com %d posições, insira as coordenadas iniciais.\nO tabuleiro tem %d linhas e %d colunas, ou seja:\n\"x inicial\" deve estar compreendido entre 0 e %d;\n\"y inicial\" deve estar compreendido entre 0 e %d:\n", boatType, boatSize, N, M, N - 1, N - 1);
@@ -779,7 +846,13 @@ int main(void)
         scanf("%d", &x);
         if (x < 0 || x >= N)
         {
-          system("clear || cls");
+          // Verifica se o jogador deseja sair
+          if (x == -1)
+          {
+            printf("%s saiu do jogo.\n", defender);
+            defExit = 1;
+            break;
+          }
 
           printInfo("Tipo de coordenada inválida. Por favor, adicione uma disponível.", 1);
 
@@ -791,14 +864,18 @@ int main(void)
         scanf("%d", &y);
         if (y < 0 || y >= M)
         {
-          system("clear || cls");
+          // Verifica se o jogador deseja sair
+          if (y == -1)
+          {
+            printf("%s saiu do jogo.\n", defender);
+            defExit = 1;
+            break;
+          }
 
           printInfo("Tipo de coordenada inválida. Por favor, adicione uma disponível.", 1);
 
           continue;
         }
-
-        system("clear || cls");
 
         int boatPlacement = place_boat(x, y, dir, boatType, &brd);
 
@@ -825,27 +902,42 @@ int main(void)
           checkBoatPlacement = 1;
         }
       }
-    }
 
-    system("clear || cls");
+      if (defExit)
+      {
+        // Pergunta se o jogador deseja começar um novo jogo.
+        if (!askNewGame())
+        {
+          return 0;
+        }
+        else
+        {
+          init_board(N, M, &brd);
+          i = -1;
+          printInfo("A começar um novo jogo.", 0);
+          printf("\n");
+        }
+      }
+    }
 
     /** Variáveis auxiliares:
      * availablePlays: Jogadas disponíveis;
-     * (targetX, targetY): Coordenadas a atacar;
-     * Surrender: Caso o jogador atacante veja o tabuleiro adversário, rendendo-se;
-     * Exit: Caso o jogador atacante decidir sair do jogo.
+     * (targetX, targetY): Coordenada a atacar;
+     * exit:
+     *  - (0) Caso o jogador atacante decida não sair/render-se;
+     *  - (1) Caso o jogador atacante decidir sair do jogo;
+     *  - (2) Caso o jogador atacante veja o tabuleiro adversário, rendendo-se.
+     * cloneBoard: Cópia do tabuleiro inicial, caso o jogador atacante o decida visualizar.
      */
-    int availablePlays = 40, targetX, targetY, surrender = 0, exit = 0;
-    // Variável usada para continuar o jogo, depois de uma pausa no terminal.
-    char continueGame[10];
-    // Cópia do tabuleiro inicial.
+    int availablePlays = 40, targetX, targetY, exit = 0;
     Board cloneBoard = brd;
 
     while (availablePlays > 0 && brd.numBoatsAfloat)
     {
       print_board(N, M, brd.board, 0);
 
-      if (surrender)
+      // Caso o jogador atacante se tenha rendido
+      if (exit == 2)
       {
         printf(ANSI_COLOR_YELLOW "\nATENÇÃO: %s já ganhou o jogo, dado você visualizou o tabuleiro inimigo." ANSI_COLOR_RESET, defender);
       }
@@ -859,77 +951,46 @@ int main(void)
       // Continua a mensagem
       printf(".\nCaso deseje (declarando a vitória a %s):\n - Sair, digite \"" ANSI_COLOR_YELLOW "-1" ANSI_COLOR_RESET "\" numa das coordenadas.\n - Ver todos os navios (o jogo continuará), digite \"" ANSI_COLOR_YELLOW "-2" ANSI_COLOR_RESET "\" numa das coordenadas.\n", defender);
 
-      // Coordenadas a atacar
+      // Coordenadas x a atacar
       printf("Coordenada a atacar:\n");
       printf("x: ");
       scanf("%d", &targetX);
+
+      // Verifica a coordenada x
+      if (targetX == -1 || targetX == -2)
+      {
+        exit = confirmExit(targetX, cloneBoard, attacker, defender);
+
+        if (!exit || exit == 2)
+        {
+          continue;
+        }
+        else
+        {
+          break;
+        }
+      }
+
+      // Coordenada y a atacar
       printf("y: ");
       scanf("%d", &targetY);
 
-      if (targetX == -1 || targetY == -1)
+      // Verifica a coordenada y
+      if (targetY == -1 || targetY == -2)
       {
-        // Caso o jogador decida sair do jogo.
+        exit = confirmExit(targetY, cloneBoard, attacker, defender);
 
-        // Confirma se o jogador realmente quer desistir.
-        char confirmSurrender = ' ';
-        // Ciclo irá repetir até que uma opção válida seja introduzida.
-        while (confirmSurrender != 'S' && confirmSurrender != 'N')
+        // Se decidir não sair ou render-se
+        if (!exit || exit == 2)
         {
-          system("clear || cls");
-          printf(ANSI_COLOR_YELLOW "Deseja realmente sair? [S/N]: " ANSI_COLOR_RESET);
-          scanf(" %c", &confirmSurrender);
-        }
-
-        if (confirmSurrender == 'N')
-        {
-          system("clear || cls");
           continue;
         }
-
-        printf(ANSI_COLOR_RED "%s saiu do jogo.\n" ANSI_COLOR_RESET, attacker);
-        exit = 1;
-        break;
+        // Se decidir sair
+        else
+        {
+          break;
+        }
       }
-      else if (targetX == -2 || targetY == -2)
-      {
-        // Confirma se o jogador realmente quer desistir.
-        char confirmSurrender = ' ';
-        // Ciclo irá repetir até que uma opção válida seja introduzida.
-        while (confirmSurrender != 'S' && confirmSurrender != 'N')
-        {
-          system("clear || cls");
-          printf(ANSI_COLOR_YELLOW "Quer realmente desistir do jogo ao ver o tabuleiro inimigo?" ANSI_COLOR_RESET "\nO jogo continuará de qualquer forma.\nDeseja desistir [S/N]: ");
-          scanf(" %c", &confirmSurrender);
-        }
-
-        if (confirmSurrender == 'N')
-        {
-          system("clear || cls");
-          continue;
-        }
-
-        // Caso o jogador desista, vendo o tabuleiro adversário.
-        surrender = 1;
-
-        // Reinicia o valor da string "continueGame".
-        strcpy(continueGame, "");
-        // Enquanto o input for diferente de "ok"...
-        while (strcmp(continueGame, "ok"))
-        {
-          system("clear || cls");
-          printf(ANSI_COLOR_YELLOW "ATENÇÃO: %s, você perdeu o jogo." ANSI_COLOR_RESET " O jogo continuará de qualquer forma.\nO tabuleiro com os navios de %s será exibido.\n\n", attacker, defender);
-
-          print_board(N, M, cloneBoard.board, 1);
-
-          printf("\nEscreva \"" ANSI_COLOR_GREEN "ok" ANSI_COLOR_RESET "\" para continuar: ");
-          scanf(" %s", continueGame);
-        }
-
-        system("clear || cls");
-        continue;
-      }
-
-      system("clear || cls");
 
       int targetState = target(targetX, targetY, &brd);
 
@@ -959,29 +1020,16 @@ int main(void)
       }
     }
 
+    // Parabeliza o jogador vencedor.
+    printf(ANSI_COLOR_GREEN "Parabéns %s, você ganhou a %dª ronda.\n" ANSI_COLOR_RESET, (!brd.numBoatsAfloat && exit != 2 && !exit) ? attacker : defender, plays + 1);
+
     if (!plays)
     {
-      // Reinicia o valor da string "continueGame".
-      strcpy(continueGame, "");
-      // Enquanto o input for diferente de "ok"...
-      while (strcmp(continueGame, "ok"))
-      {
-        system("clear || cls");
-
-        // Parabeliza o jogador vencedor.
-        printf(ANSI_COLOR_GREEN "Parabéns %s, você ganhou a %dª ronda.\n" ANSI_COLOR_RESET, (!brd.numBoatsAfloat && !surrender && !exit) ? attacker : defender, plays + 1);
-
-        printf("\nEscreva \"" ANSI_COLOR_GREEN "ok" ANSI_COLOR_RESET "\" para continuar: ");
-        scanf(" %s", continueGame);
-      }
-
       if (exit)
       {
         // Pergunta se o jogador deseja começar um novo jogo.
         if (!askNewGame())
         {
-          // Caso não, sai
-          system("clear || cls");
           return 0;
         }
 
@@ -998,11 +1046,10 @@ int main(void)
       if (!askNewGame())
       {
         // Caso não, sai
-        system("clear || cls");
         return 0;
       }
 
-      // Se sim, começa um novo jogo reiniciando o número de jogadas.
+      // Caso afirmativo, começa um novo jogo reiniciando o número de jogadas.
       plays = 0;
       continue;
     }
