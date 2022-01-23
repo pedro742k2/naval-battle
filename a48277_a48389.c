@@ -152,23 +152,28 @@ void print_board(int n, int m, char board[n][m], int flag)
  **/
 int typeToSize(char type)
 {
+  int size = -1;
+
   switch (type)
   {
   case 'P':
-    return 5;
+    size = 5;
+    break;
 
   case 'N':
-    return 4;
+    size = 4;
+    break;
 
   case 'C':
-    return 3;
+    size = 3;
+    break;
 
   case 'S':
-    return 2;
-
-  default:
-    return -1;
+    size = 2;
+    break;
   }
+
+  return size;
 }
 
 /**
