@@ -287,18 +287,18 @@ int place_boat(int x1, int y1, int dir, char type, Board *board)
 
   int boatSize = newBoat.tSize;
 
-  // Verifica se as posições estão livres
-  if (!check_free(N, M, &newBoat, board->board))
-  {
-    return -1;
-  }
-
   if (dir == 'H')
   {
     // Valida as coordenadas na horizontal
     if (x1 < 0 || x1 + boatSize > M || y1 < 0 || y1 >= N)
     {
       return -2;
+    }
+
+    // Verifica se as posições estão livres
+    if (!check_free(N, M, &newBoat, board->board))
+    {
+      return -1;
     }
 
     // Coloca o barco no tabuleiro (horizontal)
@@ -313,6 +313,12 @@ int place_boat(int x1, int y1, int dir, char type, Board *board)
     if (x1 < 0 || x1 >= M || y1 < 0 || y1 + boatSize > N)
     {
       return -2;
+    }
+
+    // Verifica se as posições estão livres
+    if (!check_free(N, M, &newBoat, board->board))
+    {
+      return -1;
     }
 
     // Coloca o barco no tabuleiro (vertical)
