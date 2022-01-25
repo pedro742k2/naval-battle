@@ -1,11 +1,5 @@
 # Trabalho Prático - Programação
 
-## Hiperligações essenciais
-- [Enunciado](https://moodle.ubi.pt/pluginfile.php/531717/mod_resource/content/1/BatalhaNaval.pdf);
-- [Código base](https://moodle.ubi.pt/pluginfile.php/531716/mod_resource/content/1/BatalhaNaval.c);
-- [Repositório do trabalho](https://github.com/pedro742k2/naval-battle);
-- [Ficheiro fonte README.md](https://hackmd.io/@pedro742k2/batalha-naval) (Para o GitHub).
-
 ## Elementos do grupo
 |            Nome            | Número |
 |:--------------------------:|:------:|
@@ -16,16 +10,16 @@
 
 ### Submissão do trabalho:
 
-- [ ] O nome do ficheiro deve ser constituído pelos números dos elementos do grupo, separados pelo caracter "_" (underscore), neste caso "a48277_a48389.c";
-- [ ] Os elementos de grupo devem ser identificados no início do ficheiros;
-- [ ] Os trabalhos não devem conter erros ou avisos de compilação, caso contrário será atribuída nota zero;
+- [x] O nome do ficheiro deve ser constituído pelos números dos elementos do grupo, separados pelo caracter "_" (underscore), neste caso "a48277_a48389.c";
+- [x] Os elementos de grupo devem ser identificados no início do ficheiros;
+- [x] Os trabalhos não devem conter erros ou avisos de compilação, caso contrário será atribuída nota zero;
 
 ### Desenvolvimento do programa:
 
-- [ ] As assinaturas das funções devem permanecer tal como estão no código base;
-- [ ] Se usar outras funções auxiliares, as mesmas devem estar dentro das funções iniciais;
-- [ ] As funções para as quais não é indicado input/output, não devem ter input/output;
-- [ ] As estruturas (*structs*) no código base devem ser utilizadas, não sendo permitida qualquer alteração nas mesmas;
+- [x] As assinaturas das funções devem permanecer tal como estão no código base;
+- [x] Se usar outras funções auxiliares, as mesmas devem estar dentro das funções iniciais;
+- [x] As funções para as quais não é indicado input/output, não devem ter input/output;
+- [x] As estruturas (*structs*) no código base devem ser utilizadas, não sendo permitida qualquer alteração nas mesmas;
 
 ## Funcionamento
 
