@@ -31,50 +31,61 @@ typedef struct
 /**Associa cada coordenada do barco com um estado**/
 typedef struct
 {
-  int afloat;   //0 indica que está afundada, 1 indica que não
-  Position pos; //Coordenada
+  int afloat;   // 0 indica que está afundada, 1 indica que não
+  Position pos; // Coordenada
 } StateCoord;
 
 /**Representa um barco**/
 typedef struct
 {
-  int afloat;          //Posições que ainda não foram afundadas
-  int tSize;           //Tamanho do tipo do barco
-  StateCoord coord[5]; //O barco maior tem 5 coordenadas, usando o tSize garantimos que acedemos apenas às existentes
-  char type;           //Caracter que representa o tipo do barco
+  int afloat;          // Posições que ainda não foram afundadas
+  int tSize;           // Tamanho do tipo do barco
+  StateCoord coord[5]; // O barco maior tem 5 coordenadas, usando o tSize garantimos que acedemos apenas às existentes
+  char type;           // Caracter que representa o tipo do barco
 } Boat;
 
 /**Representa um tabuleiro**/
 typedef struct
 {
-  int numBoatsAfloat; //Número de barcos não afundados
-  int numBoats;       //Número de barcos que foram colocados
-  Boat boats[B];      //Array de barcos. Cada barco é do tipo Boat.
-  char board[N][M];   //Array que contém a informação de cada posição do tabuleiro
+  int numBoatsAfloat; // Número de barcos não afundados
+  int numBoats;       // Número de barcos que foram colocados
+  Boat boats[B];      // Array de barcos. Cada barco é do tipo Boat.
+  char board[N][M];   // Array que contém a informação de cada posição do tabuleiro
 } Board;
 
 /**
  * NOTA IMPORTANTE:
- * Não pode alterar nenhuma das assinaturas das funções abaixo. 
+ * Não pode alterar nenhuma das assinaturas das funções abaixo.
  * Este ficheiro tem de ser considerado em conjunção com o enunciado do TP2.
  **/
 
 /**
+ * Function: cleanConsole
+ *
+ * Limpa o histórico do terminal.
+ *
+ **/
+void clearConsole(void)
+{
+  system("clear || cls");
+}
+
+/**
  * Function: init_board
- * 
+ *
  * Inicializa um Board.
- * 
+ *
  * n: dimensão x do tabuleiro
  * m: dimensão y do tabuleiro
  * b: apontador para o Board que vai ser inicializado
- * 
+ *
  **/
 void init_board(int n, int m, Board *b)
 {
   b->numBoatsAfloat = 0;
   b->numBoats = 0;
 
-  //Inicializa o array board
+  // Inicializa o array board
   for (int i = 0; i < n; i++)
   {
     for (int j = 0; j < m; j++)
@@ -86,16 +97,16 @@ void init_board(int n, int m, Board *b)
 
 /**
  * Function: print_board
- * 
+ *
  * Mostra no ecrã o estado atual do tabuleiro.
- * Se a flag é 0 (zero) não mostra os barcos, se for 1, mostra. 
+ * Se a flag é 0 (zero) não mostra os barcos, se for 1, mostra.
  * Quando a flag é 1, para indicar a posição de cada barco, é colocada em todas
  * as posições do barco a letra que representa o seu tipo.
- * 
+ *
  * n: número de linhas do tabuleiro
  * m: número de colunas do tabuleiro
  * board: estado do tabuleiro
- * flag: indicador do modo de visualização do tabuleiro -- se for 0 (zero) não 
+ * flag: indicador do modo de visualização do tabuleiro -- se for 0 (zero) não
  *       mostra os barcos; se for diferente de 0 (zero) mostra.
  */
 
@@ -111,11 +122,11 @@ void print_board(int n, int m, char board[n][m], int flag)
   for (int i = 0; i < m; i++)
   {
     printf("|");
-    if (flag) //Mostra tudo
+    if (flag) // Mostra tudo
     {
       for (int j = 0; j < n; j++)
       {
-        printf(" %c |", board[i][j]);
+        printf(ANSI_COLOR_GREEN " %c " ANSI_COLOR_RESET "|", board[i][j]);
       }
       printf("\n");
     }
@@ -124,8 +135,9 @@ void print_board(int n, int m, char board[n][m], int flag)
       char charToPrint;
       for (int j = 0; j < n; j++)
       {
+        printf(ANSI_COLOR_RED);
         charToPrint = (board[i][j] == '*' || board[i][j] == 'A' || board[i][j] == 'F') ? board[i][j] : ' ';
-        printf(" %c |", charToPrint);
+        printf(" %c " ANSI_COLOR_RESET "|", charToPrint);
       }
       printf("\n");
     }
@@ -139,13 +151,13 @@ void print_board(int n, int m, char board[n][m], int flag)
   }
 }
 
-/** 
+/**
  * Function: typeToSize
- * 
+ *
  * Dado o tipo do barco devolve o seu tamanho.
- * 
+ *
  * type: tipo do barco ('P', 'N', 'C', ou 'S')
- * 
+ *
  * return
  *  -1 se o tipo de barco for inválido
  *  caso contrário, devolve o tamanho do barco
@@ -178,23 +190,23 @@ int typeToSize(char type)
 
 /**
  * Function: init_boat
- * 
- * Dado um apontador para um barco, o tipo, a posição inicial e a direcção, 
- * inicializa o barco com todas as sua posições, tamanho e tipo. 
+ *
+ * Dado um apontador para um barco, o tipo, a posição inicial e a direcção,
+ * inicializa o barco com todas as sua posições, tamanho e tipo.
  * Por exemplo, se o tipo do barco é 'C' (contratorpedeiro),
- * a posição inicial (1,1), e a direcção 'H', então o barco fica inicializado 
+ * a posição inicial (1,1), e a direcção 'H', então o barco fica inicializado
  * com os seguintes valores
- * 
+ *
  * afloat = 3;
  * tSize = 3;
  * coord = [(1,(1,1)),(1,(1,2)),(1,(1,3))]; Onde (s,(x,y)) representa um elemento do tipo StateCoord
  * type = 'C';
- * 
+ *
  * b: barco que vai ser inicializado
  * type: tipo do barco
  * xy: posição inicial do barco
  * dir: direcção do barco
- * 
+ *
  **/
 void init_boat(Boat *b, char type, Position xy, char dir)
 {
@@ -220,19 +232,19 @@ void init_boat(Boat *b, char type, Position xy, char dir)
 
 /**
  * Function: check_free
- * 
- * Verifica se estão livres todas as posições que serão ocupadas por um 
+ *
+ * Verifica se estão livres todas as posições que serão ocupadas por um
  * barco no tabuleiro.
- * 
+ *
  * n: dimensão x do tabuleiro
  * m: dimensão y do tabuleiro
  * boat: barco a colocar no tabuleiro
  * board: estado atual do tabuleiro
- * 
+ *
  * returns:
  *  1 se todas as posições estão livres
  *  0 caso contrário
- * 
+ *
  **/
 int check_free(int n, int m, Boat *boat, char board[n][m])
 {
@@ -247,18 +259,18 @@ int check_free(int n, int m, Boat *boat, char board[n][m])
   return 1;
 }
 
-/** 
+/**
  * Function: place_boat
- * 
+ *
  * Cria e coloca, se tal for possível, um barco no tabuleiro.
- * 
- * x1: coordenada x inicial do barco  
- * y1: coordenada y inicial do barco  
+ *
+ * x1: coordenada x inicial do barco
+ * y1: coordenada y inicial do barco
  * dir: dirrecção do barco ('H' ou 'V')
- * type: o tipo de barco 
+ * type: o tipo de barco
  * board: estado atual do tabuleiro
  *
- * returns: 
+ * returns:
  * 0 se o barco for colocado com sucesso.
  * -1 se alguma das posições já está ocupada.
  * -2 se as coordenadas forem inválidas.
@@ -338,8 +350,8 @@ int place_boat(int x1, int y1, int dir, char type, Board *board)
 
 /**
  * Function: check_sink
- *  
- * Verifica se ao atacar a posição (x,y) algum barco é afundado. 
+ *
+ * Verifica se ao atacar a posição (x,y) algum barco é afundado.
  *
  * x: coordenada x a atacar
  * y: coordenada y a atacar
@@ -404,24 +416,24 @@ char check_sink(int x, int y, Board *board)
 
 /**
  * Function: target
- * 
+ *
  * Ataca a coordenada (x,y) no tabuleiro.
- * Se a coordenada (x,y) é parte de um barco, então coloca um '*' nessa 
- * posição '*'; caso contrário coloca a letra 'F' nessa posição; caso afunde 
+ * Se a coordenada (x,y) é parte de um barco, então coloca um '*' nessa
+ * posição '*'; caso contrário coloca a letra 'F' nessa posição; caso afunde
  * um barco coloca em todas as posições desse barco a letra 'A'.
- * 
+ *
  * x: coordenada x a atacar
  * y: coordenada y a atacar
  * board: estado atual do tabuleiro
- * 
+ *
  * returns:
  *   0 se a posicao já foi atacada anteriormente
  *   1 se acerta numa coordenada de um barco mas sem o afundar
  *   -1 se nao tiver sucesso
- *   -2 se a coordenada for inválida. 
- *   caso afunde um barco, devolve o número correspondente ao tamanho do barco 
+ *   -2 se a coordenada for inválida.
+ *   caso afunde um barco, devolve o número correspondente ao tamanho do barco
  *   que afundou (valor de 2 a 5)
- * 
+ *
  **/
 int target(int x, int y, Board *board)
 {
@@ -482,15 +494,15 @@ int target(int x, int y, Board *board)
 
 /**
  * Function: listBoatsAfloat
- * 
+ *
  * Lista os barcos não afundados.
- * 
+ *
  * board: estado atual do tabuleiro
- * 
+ *
  * returns:
  *  1 se o tipo de barco está disponível
  *  0 caso contrário
- * 
+ *
  **/
 void listBoatsAfloat(Board board)
 {
@@ -518,16 +530,16 @@ void listBoatsAfloat(Board board)
 
 /**
  * Function: checkTypeAvailability
- * 
+ *
  * Verifica se existem barcos do tipo dado disponíveis.
- * 
+ *
  * board: estado atual do tabuleiro
  * type: tipo do barco
- * 
+ *
  * returns:
  *  1 se o tipo de barco está disponível
  *  0 caso contrário
- * 
+ *
  **/
 int checkTypeAvailability(Board board, char type)
 {
@@ -559,16 +571,17 @@ int checkTypeAvailability(Board board, char type)
 
 /**
  * Function: askNewGame
- * 
+ *
  * Pergunta ao jogador se deseja começar um novo jogo.
- * 
+ *
  * returns:
  *  1 se o jogador desejar começar um novo jogo
  *  0 caso contrário
- * 
+ *
  **/
 int askNewGame(void)
 {
+  clearConsole();
   char newGame = ' ';
 
   // Ciclo irá repetir até que uma opção válida seja introduzida.
@@ -588,9 +601,9 @@ int askNewGame(void)
 
 /**
  * Function: printInfo
- * 
+ *
  * Imprime uma mensagem com um formato especial, conforme sucesso ou erro.
- * 
+ *
  * message: Mensagem a ser impressa.
  * error: 2 se for uma mensagem de aviso, 1 se for de erro e 0 se for de sucesso.
  */
@@ -598,7 +611,6 @@ void printInfo(char *message, int error)
 {
   int messageLength = strlen(message);
 
-  printf("\n");
   // Ciclo que imprime os traços do tamanho da string
   for (int i = 0; i < messageLength; i++)
   {
@@ -636,19 +648,19 @@ void printInfo(char *message, int error)
 
 /**
  * Function: confirmExit
- * 
+ *
  * Verifica se o jogador deseja sair ou render-se.
- * 
+ *
  * valueToCheck: Valor a verificar
  * cloneBoard: Clone do tabuleiro com os barcos originais
  * attacker: Nome do jogador atacante
  * defender: Nome do jogador defensor
- * 
+ *
  * returns:
  *  2 caso o jogador deseje render-se (e visualize o tabuleiro inimigo)
  *  1 caso deseje sair
  *  0 caso anule a decisão de sair/render-se
- * 
+ *
  **/
 int confirmExit(int valueToCheck, Board cloneBoard, char *attacker, char *defender)
 {
@@ -722,6 +734,8 @@ int main(void)
   // Nome dos jogadores
   char player1[100] = "", player2[100] = "";
 
+  clearConsole();
+
   // Pedido da idenficiação dos jogadores
   printInfo("Bem-vindos. Primeiramente, insiram os nomes dos jogadores (Máximo 100 caracteres)", -1);
   printf("Jogador defensor: ");
@@ -763,9 +777,11 @@ int main(void)
       strcpy(attacker, player1);
     }
 
+    clearConsole();
+
     printf("Partida " ANSI_COLOR_GREEN "%d/2" ANSI_COLOR_RESET ".\n%s irá proceder à colocação dos " ANSI_COLOR_GREEN "%d" ANSI_COLOR_RESET " navios e %s irá atacá-los.\n\n", plays + 1, defender, B, attacker);
 
-    /** 
+    /**
      * Variáveis auxiliares:
      *  boatType: Armazena o tipo de barco temporariamente
      *  dir: Armazena a direção do barco temporariamente
@@ -789,8 +805,8 @@ int main(void)
 
         printf("\n%s, restam colocar " ANSI_COLOR_GREEN "%d" ANSI_COLOR_RESET " navios.\n-------------------------------| Barco %d |-------------------------------\n", defender, B - brd.numBoatsAfloat, i);
 
-        printInfo("Nos inputs que se seguem, se assim o desejar, insira \"q\" para sair.", 2);
         printf("\n");
+        printInfo("Nos inputs que se seguem, se assim o desejar, insira \"q\" para sair.", 2);
 
         // Tipo de barco e nº de posições.
         printf("Tipo de barco ('P', 'N', 'C' ou 'S'): ");
@@ -799,6 +815,7 @@ int main(void)
         // Verifica se o jogador deseja sair
         if (boatType == 'q')
         {
+          clearConsole();
           printf("%s saiu do jogo.\n", defender);
           defExit = 1;
           break;
@@ -808,6 +825,7 @@ int main(void)
 
         if (boatSize == -1)
         {
+          clearConsole();
           printInfo("Tipo de barco inválido. Por favor, adicione um dos disponíveis.", 1);
 
           continue;
@@ -815,6 +833,7 @@ int main(void)
 
         if (!checkTypeAvailability(brd, boatType))
         {
+          clearConsole();
           printInfo("Tipo de barco indisponível. Por favor, adicione um dos disponíveis.", 1);
 
           continue;
@@ -850,7 +869,7 @@ int main(void)
         printInfo("Nos inputs que se seguem, se assim o desejar, insira \"-1\" para sair.", 2);
 
         // Pedido das coordenadas iniciais do barco a colocar
-        printf("\nConsiderando o barco '%c' com %d posições, insira as coordenadas iniciais.\nO tabuleiro tem %d linhas e %d colunas, ou seja:\n\"x inicial\" deve estar compreendido entre 0 e %d;\n\"y inicial\" deve estar compreendido entre 0 e %d:\n", boatType, boatSize, N, M, N - 1, N - 1);
+        printf("Considerando o barco '%c' com %d posições, insira as coordenadas iniciais.\nO tabuleiro tem %d linhas e %d colunas, ou seja:\n\"x inicial\" deve estar compreendido entre 0 e %d;\n\"y inicial\" deve estar compreendido entre 0 e %d:\n", boatType, boatSize, N, M, N - 1, N - 1);
 
         // Coordenada inicial "x" do barco
         printf("x inicial: ");
@@ -860,6 +879,7 @@ int main(void)
           // Verifica se o jogador deseja sair
           if (x == -1)
           {
+            clearConsole();
             printf("%s saiu do jogo.\n", defender);
             defExit = 1;
             break;
@@ -878,6 +898,7 @@ int main(void)
           // Verifica se o jogador deseja sair
           if (y == -1)
           {
+            clearConsole();
             printf("%s saiu do jogo.\n", defender);
             defExit = 1;
             break;
@@ -889,6 +910,8 @@ int main(void)
         }
 
         int boatPlacement = place_boat(x, y, dir, boatType, &brd);
+
+        clearConsole();
 
         switch (boatPlacement)
         {
@@ -923,6 +946,7 @@ int main(void)
         }
         else
         {
+          clearConsole();
           init_board(N, M, &brd);
           i = -1;
           printInfo("A começar um novo jogo.", 0);
@@ -945,6 +969,7 @@ int main(void)
 
     while (availablePlays > 0 && brd.numBoatsAfloat)
     {
+      clearConsole();
       print_board(N, M, brd.board, 0);
 
       // Caso o jogador atacante se tenha rendido
@@ -1031,6 +1056,7 @@ int main(void)
       }
     }
 
+    clearConsole();
     // Parabeliza o jogador vencedor.
     printf(ANSI_COLOR_GREEN "Parabéns %s, você ganhou a %dª ronda.\n" ANSI_COLOR_RESET, (!brd.numBoatsAfloat && exit != 2 && !exit) ? attacker : defender, plays + 1);
 
